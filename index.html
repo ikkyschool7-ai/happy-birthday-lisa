@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Lisa! 🎈</title>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Sacramento&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            color: #4a4a4a;
+        }
+
+        /* Floating Background Animation */
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .heart-particle {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.7);
+            animation: floatUp 6s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Main Container */
+        .card-container {
+            width: 90%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out forwards;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Elements & Typography */
+        h1 {
+            font-family: 'Sacramento', cursive;
+            font-size: 2.8rem;
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 12px 28px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.6);
+        }
+
+        /* Envelope (Slide 2) */
+        .envelope-wrapper {
+            cursor: pointer;
+            margin: 20px auto;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s;
+        }
+
+        .envelope-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .letter-box {
+            background: #f0f0f9;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+            min-height: 120px;
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 15px;
+            border-left: 4px solid #764ba2;
+        }
+
+        /* Cake & Flame (Slide 3) */
+        .cake-container {
+            position: relative;
+            margin: 30px auto;
+            width: 120px;
+        }
+
+        .cake {
+            width: 120px;
+            height: 70px;
+            background: #ff6b9d;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            box-shadow: inset 0 -10px 0 #ff4081;
+        }
+
+        .candle {
+            width: 12px;
+            height: 35px;
+            background: repeating-linear-gradient(45deg, #fff, #fff 5px, #74b9ff 5px, #74b9ff 10px);
+            position: absolute;
+            top: -35px;
+            left: 54px;
+            border-radius: 3px;
+        }
+
+        .flame {
+            width: 14px;
+            height: 20px;
+            background: #fffa65;
+            border-radius: 50% 50% 20% 20%;
+            position: absolute;
+            top: -18px;
+            left: -1px;
+            box-shadow: 0 0 10px #fffa65, 0 0 20px #ffaf40;
+            animation: flicker 0.6s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15) rotate(2deg); }
+        }
+
+        .flame.off {
+            display: none;
+        }
+
+        /* Polaroid Gallery (Slide 4) */
+        .polaroid-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .polaroid {
+            background: white;
+            padding: 8px 8px 15px 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            transform: rotate(-3deg);
+            width: 45%;
+        }
+
+        .polaroid:nth-child(2) {
+            transform: rotate(4deg);
+        }
+
+        .polaroid img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .polaroid span {
+            font-size: 0.75rem;
+            color: #777;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Music Floating Button */
+        .music-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            cursor: pointer;
+            z-index: 10;
+            color: white;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-sunny.mp3" type="audio/mpeg">
+    </audio>
+    <button class="music-btn" onclick="toggleMusic()"><i class="fa-solid fa-music"></i></button>
+
+    <div class="card-container">
+        
+        <!-- SLIDE 1: Pembuka -->
+        <div class="slide active" id="slide1">
+            <h1>Halo Lisa! ✨</h1>
+            <p>Ada sesuatu yang spesial khusus dibuat untuk kamu di hari yang indah ini.</p>
+            <button class="btn" onclick="nextSlide(2)">Buka Pesan 🎁</button>
+        </div>
+
+        <!-- SLIDE 2: Kartu & Ucapan -->
+        <div class="slide" id="slide2">
+            <h1>Pesan Spesial</h1>
+            <div class="envelope-wrapper" id="envelope" onclick="openLetter()">
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+            <div class="letter-box" id="letterBox" style="display: none;">
+                <p id="typewriter"></p>
+            </div>
+            <button class="btn" id="btnSlide2" style="display: none;" onclick="nextSlide(3)">Lanjut ➡️</button>
+        </div>
+
+        <!-- SLIDE 3: Kue & Tiup Lilin -->
+        <div class="slide" id="slide3">
+            <h1>Make a Wish 🎂</h1>
+            <p>Make a wish dulu ya, lalu klik tombol di bawah untuk meniup lilinnya!</p>
+            
+            <div class="cake-container">
+                <div class="candle">
+                    <div class="flame" id="flame"></div>
+                </div>
+                <div class="cake"></div>
+            </div>
+
+            <button class="btn" id="blowBtn" onclick="blowCandle()">💨 Tiup Lilin</button>
+            <button class="btn" id="btnSlide3" style="display: none;" onclick="nextSlide(4)">Lihat Kenangan 📸</button>
+        </div>
+
+        <!-- SLIDE 4: Galeri & Penutup -->
+        <div class="slide" id="slide4">
+            <h1>Happy Birthday Lisa! 🎉</h1>
+            <div class="polaroid-container">
+                <div class="polaroid">
+                    <img src="https://imgur.com/D5K8L9m.jpg" alt="Foto Lisa 1">
+                    <span>Cantik Alami</span>
+                </div>
+                <div class="polaroid">
+                    <img src="https://imgur.com/H2M9P4k.jpg" alt="Foto Lisa 2">
+                    <span>Senyumanmu Terindah</span>
+                </div>
+            </div>
+            <p style="margin-top: 10px; font-style: italic;">Semoga semua impianmu tercapai dan harimu selalu dipenuhi kebahagiaan! Terima kasih telah menjadi kakak yang luar biasa 💕</p>
+            <button class="btn" onclick="location.reload()">Ulangi 🔄</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Floating Background Hearts
+        const heartsBg = document.getElementById('heartsBg');
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('i');
+            heart.classList.add('fa-solid', 'fa-heart', 'heart-particle');
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
+            heartsBg.appendChild(heart);
+        }
+
+        function id(elemId) { return document.getElementById(elemId); }
+
+        // Slide Navigation
+        function nextSlide(slideNumber) {
+            document.querySelectorAll('.slide').forEach(slide => slide.classList.remove('active'));
+            id('slide' + slideNumber).classList.add('active');
+            playMusic();
+        }
+
+        // Music Player Toggle
+        const music = id('bgMusic');
+        let isPlaying = false;
+        function playMusic() {
+            if (!isPlaying) {
+                music.play().catch(() => {});
+                isPlaying = true;
+            }
+        }
+        function toggleMusic() {
+            if (isPlaying) {
+                music.pause();
+                isPlaying = false;
+            } else {
+                music.play();
+                isPlaying = true;
+            }
+        }
+
+        // Slide 2: Typewriter Text
+        const messageText = "Selamat ulang tahun Lisa! 🎉\n\nTerima kasih sudah menjadi kakak yang selalu ada, selalu mendukung, dan selalu membawa tawa di setiap momen. Kamu adalah inspirasi dan contoh yang luar biasa.\n\nSemoga di usiamu yang baru ini, kamu semakin bahagia, sehat selalu, raih semua impianmu, dan dikelilingi oleh hal-hal indah. Kamu layak mendapatkan yang terbaik!\n\nI love you! ✨💖";
+        let typeIndex = 0;
+
+        function openLetter() {
+            id('envelope').style.display = 'none';
+            id('letterBox').style.display = 'block';
+            typeWriter();
+        }
+
+        function typeWriter() {
+            if (typeIndex < messageText.length) {
+                id('typewriter').innerHTML += messageText.charAt(typeIndex);
+                typeIndex++;
+                setTimeout(typeWriter, 40);
+            } else {
+                id('btnSlide2').style.display = 'inline-block';
+            }
+        }
+
+        // Slide 3: Blow Candle & Confetti
+        function blowCandle() {
+            id('flame').classList.add('off');
+            id('blowBtn').style.display = 'none';
+            
+            // Fire Confetti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            setTimeout(() => {
+                id('btnSlide3').style.display = 'inline-block';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
